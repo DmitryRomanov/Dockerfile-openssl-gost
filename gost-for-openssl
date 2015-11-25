@@ -1,0 +1,21 @@
+# Adapt OpenSSL for GOST cryptography support
+# See http://www.cryptocom.ru/products/openssl-1-config-en.html
+ 
+shell_ini_config_prefix=""
+cfg="/etc/ssl/openssl.cnf"
+ 
+grep -q '^openssl_conf' $cfg || sed -i '1iopenssl_conf = openssl_def' $cfg
+ 
+  grep -q 'Gost' $cfg && exit
+  cat >> $cfg << _EOF_
+[openssl_def]
+engines = engine_section
+ 
+[engine_section]
+gost = gost_section
+ 
+[gost_section]
+engine_id = gost
+default_algorithms = ALL
+CRYPT_PARAMS = id-Gost28147-89-CryptoPro-A-ParamSet
+_EOF_
